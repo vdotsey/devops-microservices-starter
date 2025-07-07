@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: microservices-app
+  namespace: devops-apps
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lovelord88/devops-microservices-starter
+    targetRevision: HEAD
+    path: k8s/auth
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: devops-apps
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
