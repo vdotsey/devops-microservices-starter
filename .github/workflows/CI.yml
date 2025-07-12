@@ -94,6 +94,16 @@ jobs:
           if [ -f "k8s/orders/service.yaml" ]; then
           kubectl apply -f k8s/orders/service.yaml -n devops-apps
           fi
+      - name: Apply Ingress with TLS
+        run: |
+          kubectl apply -f k8s/ingress.yaml -n devops-apps
+          echo "Ingress deployed. TLS will be provisioned automatically by Cert-Manager."
+
+      # 4. Verify (optional)
+      - name: Check Ingress Status
+        run: |
+          kubectl get ingress -n devops-apps
+          kubectl describe certificate tls-secret -n devops-apps
     
           # Verify deployment
           kubectl get deployments -n devops-apps
