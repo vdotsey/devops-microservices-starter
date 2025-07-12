@@ -30,91 +30,20 @@
 #           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest ./${{ matrix.service }}
 #           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
 
-# name: CI Build and Push to ECR
-
-# on:
-#   push:
-#     branches: [ main ]
-
-# jobs:
-#   build-and-push:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         service: [auth, products, orders]
-
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v4
-
-#       - name: Configure AWS Credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: ${{ secrets.AWS_REGION }}
-
-#       - name: Login to Amazon ECR to build and push Docker images
-#         id: login-ecr
-#         uses: aws-actions/amazon-ecr-login@v2
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
-
-#       - name: Build and Push ${{ matrix.service }}
-#         run: |
-#           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-#           ECR_REPOSITORY=$ECR_REGISTRY/my-app-${{ matrix.service }}
-#           docker build -t $ECR_REPOSITORY:latest ./${{ matrix.service }}
-#           docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
-#           docker push $ECR_REPOSITORY:latest
-#           docker push $ECR_REPOSITORY:$GITHUB_SHA
-#       - name: Deploy to EKS
-#         run: |
-#           # Configure kubectl access
-#           aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
-#       - name: Create namespace if missing  
-#         run: |
-#           kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
-    
-#           # Apply deployments from nested directories
-#           kubectl apply -f k8s/auth/deployment.yaml -n devops-apps
-#           kubectl apply -f k8s/products/deployment.yaml -n devops-apps
-#           kubectl apply -f k8s/orders/deployment.yaml -n devops-apps
-
-#           kubectl delete -f k8s/auth/service.yaml -n devops-apps --ignore-not-found  
-#           kubectl apply -f k8s/auth/service.yaml -n devops-apps  
-#           # Apply services if they exist
-#           if [ -f "k8s/auth/service.yaml" ]; then
-#           kubectl apply -f k8s/auth/service.yaml  -n devops-apps
-#           fi
-#           if [ -f "k8s/products/service.yaml" ]; then
-#           kubectl apply -f k8s/products/service.yaml  -n devops-apps
-#           fi
-#           if [ -f "k8s/orders/service.yaml" ]; then
-#           kubectl apply -f k8s/orders/service.yaml -n devops-apps
-#           fi
-    
-#           # Verify deployment
-#           kubectl get deployments
-#           kubectl get pods
-#           kubectl get services
-
-name: CI Build and Deploy to EKS
+name: CI Build and Push to ECR
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         service: [auth, products, orders]
 
     steps:
-      # Build and push to ECR
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -125,7 +54,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR to build and push Docker images
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
@@ -140,30 +69,101 @@ jobs:
           docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
           docker push $ECR_REPOSITORY:latest
           docker push $ECR_REPOSITORY:$GITHUB_SHA
-
-      # Deploy to EKS
-      - name: Configure kubectl access
-        if: matrix.service == 'auth'  # Only run once
-        run: aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
-
-      - name: Ensure namespace exists
-        if: matrix.service == 'auth'  # Only run once
-        run: kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
-
-      - name: Deploy ${{ matrix.service }}
+      - name: Deploy to EKS
         run: |
-          # Apply deployment
-          kubectl apply -f k8s/${{ matrix.service }}/deployment.yaml -n devops-apps
-          
-          # Apply service if file exists
-          if [ -f "k8s/${{ matrix.service }}/service.yaml" ]; then
-            kubectl apply -f k8s/${{ matrix.service }}/service.yaml -n devops-apps
+          # Configure kubectl access
+          aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
+      - name: Create namespace if missing  
+        run: |
+          kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
+    
+          # Apply deployments from nested directories
+          kubectl apply -f k8s/auth/deployment.yaml -n devops-apps
+          kubectl apply -f k8s/products/deployment.yaml -n devops-apps
+          kubectl apply -f k8s/orders/deployment.yaml -n devops-apps
+
+          kubectl delete -f k8s/auth/service.yaml -n devops-apps --ignore-not-found  
+          kubectl apply -f k8s/auth/service.yaml -n devops-apps  
+          # Apply services if they exist
+          if [ -f "k8s/auth/service.yaml" ]; then
+          kubectl apply -f k8s/auth/service.yaml  -n devops-apps
           fi
+          if [ -f "k8s/products/service.yaml" ]; then
+          kubectl apply -f k8s/products/service.yaml  -n devops-apps
+          fi
+          if [ -f "k8s/orders/service.yaml" ]; then
+          kubectl apply -f k8s/orders/service.yaml -n devops-apps
+          fi
+    
+          # Verify deployment
+          kubectl get deployments
+          kubectl get pods
+          kubectl get services
 
-      # Verification (run once at the end)
-      - name: Verify deployments
-        if: matrix.service == 'auth'  # Only run once
-        run: |
-          kubectl get deployments -n devops-apps
-          kubectl get pods -n devops-apps
-          kubectl get services -n devops-apps
+# name: CI Build and Deploy to EKS
+
+# on:
+#   push:
+#     branches: [ main ]
+
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         service: [auth, products, orders]
+
+#     steps:
+#       # Build and push to ECR
+#       - name: Checkout repo
+#         uses: actions/checkout@v4
+
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
+
+#       - name: Build and Push ${{ matrix.service }}
+#         run: |
+#           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+#           ECR_REPOSITORY=$ECR_REGISTRY/my-app-${{ matrix.service }}
+#           docker build -t $ECR_REPOSITORY:latest ./${{ matrix.service }}
+#           docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
+#           docker push $ECR_REPOSITORY:latest
+#           docker push $ECR_REPOSITORY:$GITHUB_SHA
+
+#       # Deploy to EKS
+#       - name: Configure kubectl access
+#         if: matrix.service == 'auth'  # Only run once
+#         run: aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
+
+#       - name: Ensure namespace exists
+#         if: matrix.service == 'auth'  # Only run once
+#         run: kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
+
+#       - name: Deploy ${{ matrix.service }}
+#         run: |
+#           # Apply deployment
+#           kubectl apply -f k8s/${{ matrix.service }}/deployment.yaml -n devops-apps
+          
+#           # Apply service if file exists
+#           if [ -f "k8s/${{ matrix.service }}/service.yaml" ]; then
+#             kubectl apply -f k8s/${{ matrix.service }}/service.yaml -n devops-apps
+#           fi
+
+#       # Verification (run once at the end)
+#       - name: Verify deployments
+#         if: matrix.service == 'auth'  # Only run once
+#         run: |
+#           kubectl get deployments -n devops-apps
+#           kubectl get pods -n devops-apps
+#           kubectl get services -n devops-apps
