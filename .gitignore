@@ -1,4 +1,4 @@
 # Ignore Terraform
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.backupkubeconfig
