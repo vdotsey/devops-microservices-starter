@@ -96,7 +96,7 @@ jobs:
           fi
       - name: Apply Ingress with TLS
         run: |
-          kubectl apply -f k8s/ingress.yaml -n devops-apps
+          kubectl apply -f k8s/ingress/ingress.yaml -n devops-apps
           echo "Ingress deployed. TLS will be provisioned automatically by Cert-Manager."
 
       # 4. Verify (optional)
