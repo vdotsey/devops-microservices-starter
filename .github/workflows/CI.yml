@@ -96,9 +96,9 @@ jobs:
           fi
     
           # Verify deployment
-          kubectl get deployments
-          kubectl get pods
-          kubectl get services
+          kubectl get deployments -n devops-apps
+          kubectl get pods -n devops-apps
+          kubectl get services -n devops-apps
 
 # name: CI Build and Deploy to EKS
 
