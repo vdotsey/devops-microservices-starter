@@ -64,7 +64,7 @@ jobs:
       - name: Build and Push ${{ matrix.service }}
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY=bar
+          ECR_REPOSITORY=$ECR_REGISTRY/${{ secrets.ECR_REPO_PREFIX }}-${{ matrix.service }} # Assuming ECR_REPO_PREFIX is set in secrets
           docker build -t $ECR_REPOSITORY:latest ./${{ matrix.service }}
           docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
           docker push $ECR_REPOSITORY:latest
