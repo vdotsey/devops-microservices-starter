@@ -54,7 +54,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR to build and push Docker images
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
@@ -64,7 +64,7 @@ jobs:
       - name: Build and Push ${{ matrix.service }}
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY=$ECR_REGISTRY/${{ secrets.ECR_REPO_PREFIX }}-${{ matrix.service }}
+          ECR_REPOSITORY=$ECR_REGISTRY/${{ secrets.ECR_REPO_PREFIX }}-${{ matrix.service }} # Assuming ECR_REPO_PREFIX is set in secrets
           docker build -t $ECR_REPOSITORY:latest ./${{ matrix.service }}
           docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
           docker push $ECR_REPOSITORY:latest
