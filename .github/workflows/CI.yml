@@ -73,21 +73,24 @@ jobs:
         run: |
           # Configure kubectl access
           aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
+      - name: Create namespace if missing  
+        run: |
+          kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
     
           # Apply deployments from nested directories
-          kubectl apply -f k8s/auth/deployment.yaml
-          kubectl apply -f k8s/products/deployment.yaml
-          kubectl apply -f k8s/orders/deployment.yaml
+          kubectl apply -f k8s/auth/deployment.yaml -n devops-apps
+          kubectl apply -f k8s/products/deployment.yaml -n devops-apps
+          kubectl apply -f k8s/orders/deployment.yaml -n devops-apps
     
           # Apply services if they exist
           if [ -f "k8s/auth/service.yaml" ]; then
-          kubectl apply -f k8s/auth/service.yaml
+          kubectl apply -f k8s/auth/service.yaml  -n devops-apps
           fi
           if [ -f "k8s/products/service.yaml" ]; then
-          kubectl apply -f k8s/products/service.yaml
+          kubectl apply -f k8s/products/service.yaml  -n devops-apps
           fi
           if [ -f "k8s/orders/service.yaml" ]; then
-          kubectl apply -f k8s/orders/service.yaml
+          kubectl apply -f k8s/orders/service.yaml -n devops-apps
           fi
     
           # Verify deployment
