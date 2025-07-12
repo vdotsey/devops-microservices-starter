@@ -71,5 +71,26 @@ jobs:
           docker push $ECR_REPOSITORY:$GITHUB_SHA
       - name: Deploy to EKS
         run: |
-         aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
-         kubectl apply -f k8s/
+          # Configure kubectl access
+          aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
+    
+          # Apply deployments from nested directories
+          kubectl apply -f k8s/auth/deployment.yaml
+          kubectl apply -f k8s/products/deployment.yaml
+          kubectl apply -f k8s/orders/deployment.yaml
+    
+          # Apply services if they exist
+          if [ -f "k8s/auth/service.yaml" ]; then
+          kubectl apply -f k8s/auth/service.yaml
+          fi
+          if [ -f "k8s/products/service.yaml" ]; then
+          kubectl apply -f k8s/products/service.yaml
+          fi
+          if [ -f "k8s/orders/service.yaml" ]; then
+          kubectl apply -f k8s/orders/service.yaml
+          fi
+    
+          # Verify deployment
+          kubectl get deployments
+          kubectl get pods
+          kubectl get services
