@@ -166,4 +166,4 @@ jobs:
         run: |
           kubectl get deployments -n devops-apps
           kubectl get pods -n devops-apps
-          kubectl get services -n devops-apps
+          # kubectl get services -n devops-apps
