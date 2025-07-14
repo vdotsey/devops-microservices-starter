@@ -160,7 +160,8 @@ metadata:
   name: microservices-ingress
   namespace: devops-apps
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    # remove this line completely
+    # nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
