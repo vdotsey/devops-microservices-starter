@@ -33,7 +33,8 @@
 name: CI Build and Push to ECR
 
 on:
-  push:
+  # push:
+  workflow-dispatch:
     branches: [ main ]
 
 jobs:
