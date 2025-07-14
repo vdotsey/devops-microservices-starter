@@ -34,8 +34,7 @@ name: CI Build and Push to ECR
 
 on:
   # push:
-  workflow-dispatch:
-    branches: [ main ]
+    workflow_dispatch
 
 jobs:
   build-and-push:

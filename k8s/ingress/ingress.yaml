@@ -32,22 +32,61 @@
 #                 port:
 #                   number: 80
 
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: microservices-ingress
+#   namespace: devops-apps
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /  # Ensures paths are rewritten correctly
+#     cert-manager.io/cluster-issuer: letsencrypt-prod  # Optional: For TLS
+# spec:
+#   ingressClassName: nginx
+#   tls:
+#   - hosts:
+#     - viviennedofit.com  # Your domain
+#     secretName: tls-secret  # Auto-created by Cert-Manager
+#   rules:
+#   - host: viviennedofit.com  # Single domain
+#     http:
+#       paths:
+#       - path: /auth
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: auth
+#             port:
+#               number: 80
+#       - path: /products
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: products
+#             port:
+#               number: 80
+#       - path: /orders
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: orders
+#             port:
+#               number: 80
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: microservices-ingress
   namespace: devops-apps
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /  # Ensures paths are rewritten correctly
-    cert-manager.io/cluster-issuer: letsencrypt-prod  # Optional: For TLS
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - viviennedofit.com  # Your domain
-    secretName: tls-secret  # Auto-created by Cert-Manager
+    - viviennedofit.com
+    secretName: tls-secret
   rules:
-  - host: viviennedofit.com  # Single domain
+  - host: viviennedofit.com
     http:
       paths:
       - path: /auth
