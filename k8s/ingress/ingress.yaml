@@ -72,44 +72,44 @@
 #             port:
 #               number: 80
 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: microservices-ingress
-  namespace: devops-apps
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  ingressClassName: nginx
-  tls:
-  - hosts:
-    - viviennedofit.com
-    secretName: tls-secret
-  rules:
-  - host: viviennedofit.com
-    http:
-      paths:
-      - path: /auth
-        pathType: Prefix
-        backend:
-          service:
-            name: auth
-            port:
-              number: 80
-      - path: /products
-        pathType: Prefix
-        backend:
-          service:
-            name: products
-            port:
-              number: 80
-      - path: /orders
-        pathType: Prefix
-        backend:
-          service:
-            name: orders
-            port:
-              number: 80
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: microservices-ingress
+#   namespace: devops-apps
+#   annotations:
+#     cert-manager.io/cluster-issuer: letsencrypt-prod
+# spec:
+#   ingressClassName: nginx
+#   tls:
+#   - hosts:
+#     - viviennedofit.com
+#     secretName: tls-secret
+#   rules:
+#   - host: viviennedofit.com
+#     http:
+#       paths:
+#       - path: /auth
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: auth
+#             port:
+#               number: 80
+#       - path: /products
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: products
+#             port:
+#               number: 80
+#       - path: /orders
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: orders
+#             port:
+#               number: 80
 
 
 # apiVersion: networking.k8s.io/v1
@@ -151,3 +151,39 @@ spec:
 #             name: orders
 #             port:
 #               number: 80
+
+
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices-ingress
+  namespace: devops-apps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth
+                port:
+                  number: 80
+          - path: /products
+            pathType: Prefix
+            backend:
+              service:
+                name: products
+                port:
+                  number: 80
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: orders
+                port:
+                  number: 80
