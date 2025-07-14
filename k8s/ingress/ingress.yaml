@@ -50,21 +50,21 @@ spec:
   - host: viviennedofit.com  # Single domain
     http:
       paths:
-      - path: /auth
+      - path: /auth/?(.*)
         pathType: Prefix
         backend:
           service:
             name: auth
             port:
               number: 80
-      - path: /products
+      - path: /products/?(.*)
         pathType: Prefix
         backend:
           service:
             name: products
             port:
               number: 80
-      - path: /orders
+      - path: /orders/?(.*)
         pathType: Prefix
         backend:
           service:
