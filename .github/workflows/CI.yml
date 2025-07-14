@@ -73,27 +73,25 @@ jobs:
         run: |
           # Configure kubectl access
           aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
-      - name: Create namespace if missing  
+      - name: Create namespace and apply Kubernetes manifests
         run: |
+          # Set up namespace
           kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
-    
-          # Apply deployments from nested directories
-          kubectl apply -f k8s/auth/deployment.yaml -n devops-apps
-          kubectl apply -f k8s/products/deployment.yaml -n devops-apps
-          kubectl apply -f k8s/orders/deployment.yaml -n devops-apps
 
-          kubectl delete -f k8s/auth/service.yaml -n devops-apps --ignore-not-found  
-          kubectl apply -f k8s/auth/service.yaml -n devops-apps  
-          # Apply services if they exist
-          if [ -f "k8s/auth/service.yaml" ]; then
-          kubectl apply -f k8s/auth/service.yaml  -n devops-apps
+          # Apply deployments
+          for svc in auth products orders; do
+          if [ -f "k8s/$svc/deployment.yaml" ]; then
+          kubectl apply -f k8s/$svc/deployment.yaml -n devops-apps
           fi
-          if [ -f "k8s/products/service.yaml" ]; then
-          kubectl apply -f k8s/products/service.yaml  -n devops-apps
+          done
+
+          # Apply services
+          for svc in auth products orders; do
+          if [ -f "k8s/$svc/service.yaml" ]; then
+          kubectl apply -f k8s/$svc/service.yaml -n devops-apps
           fi
-          if [ -f "k8s/orders/service.yaml" ]; then
-          kubectl apply -f k8s/orders/service.yaml -n devops-apps
-          fi
+          done
+
       - name: Apply Ingress with TLS
         run: |
           kubectl apply -f k8s/ingress/ingress.yaml -n devops-apps
