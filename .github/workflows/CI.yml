@@ -102,8 +102,8 @@ jobs:
       # 4. Verify (optional)
       - name: Check Ingress Status
         run: |
-          kubectl get ingress -n devops-apps
-          kubectl describe certificate tls-secret -n devops-apps
+          # kubectl get ingress -n devops-apps
+          # kubectl describe certificate tls-secret -n devops-apps
     
           # Verify deployment
           kubectl get deployments -n devops-apps
