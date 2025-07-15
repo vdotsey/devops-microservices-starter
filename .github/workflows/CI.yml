@@ -102,7 +102,7 @@ jobs:
           fi
           done
       - name: Apply Monitoring Manifests
-        run: kubectl apply -f monitoring/ --namespace=devops-apps
+        run: kubectl apply -f monitoring/ 
 
 
       - name: Apply Ingress with TLS
