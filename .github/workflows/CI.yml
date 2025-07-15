@@ -101,6 +101,14 @@ jobs:
           kubectl apply -f k8s/$svc/service.yaml -n devops-apps
           fi
           done
+
+      - name: Rollout deployments
+        run: |
+          for svc in auth products orders; do
+          kubectl rollout restart deployment $svc -n devops-apps
+          done
+
+
       - name: Apply Monitoring Manifests
         run: kubectl apply -f monitoring/ 
 
