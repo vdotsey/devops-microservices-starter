@@ -1,0 +1,19 @@
+# svc-monitor-auth.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: products-monitor
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: products
+  namespaceSelector:
+    matchNames:
+    - devops-apps
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
