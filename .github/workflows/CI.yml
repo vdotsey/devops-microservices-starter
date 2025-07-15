@@ -101,6 +101,9 @@ jobs:
           kubectl apply -f k8s/$svc/service.yaml -n devops-apps
           fi
           done
+      - name: Apply Monitoring Manifests
+        run: kubectl apply -f monitoring/ --namespace=devops-apps
+
 
       - name: Apply Ingress with TLS
         run: |
