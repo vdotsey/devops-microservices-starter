@@ -11,15 +11,31 @@
 #       port: 80
 #       targetPort: 3001
 
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: products
+#   namespace: devops-apps
+#   annotations:
+#     prometheus.io/scrape: "true"
+#     prometheus.io/path: "/metrics"
+#     prometheus.io/port: "3000"
+# spec:
+#   selector:
+#     app: products
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 3001
+
+
 apiVersion: v1
 kind: Service
 metadata:
   name: products
   namespace: devops-apps
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/path: "/metrics"
-    prometheus.io/port: "3000"
+  labels:
+    app: products  # <-- This label is important for ServiceMonitor discovery
 spec:
   selector:
     app: products
