@@ -112,7 +112,6 @@ jobs:
       #     sleep 5
       #     done
   
-
       - name: Apply Monitoring Manifests
         run: kubectl apply -f monitoring/ 
 
