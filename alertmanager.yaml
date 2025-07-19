@@ -46,7 +46,7 @@ alertmanager:
       smtp_smarthost: 'smtp.gmail.com:587'
       smtp_from: 'vivienneyahaya86@gmail.com'
       smtp_auth_username: 'vivienneyahaya86@gmail.com'
-      smtp_auth_password: 'viwpyzmhduwqtayo '
+      smtp_auth_password: 'viwpyzmhduwqtayo'
       smtp_require_tls: true
 
     route:
