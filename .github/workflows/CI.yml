@@ -103,14 +103,14 @@ jobs:
           fi
           done
 
-      - name: Rollout deployments
-        run: |
-          for svc in auth products orders; do
-          echo "Restarting and waiting for rollout of $svc..."
-          kubectl rollout restart deployment $svc -n devops-apps
-          kubectl rollout status deployment $svc -n devops-apps --timeout=60s
-          sleep 5
-          done
+      # - name: Rollout deployments
+      #   run: |
+      #     for svc in auth products orders; do
+      #     echo "Restarting and waiting for rollout of $svc..."
+      #     kubectl rollout restart deployment $svc -n devops-apps
+      #     kubectl rollout status deployment $svc -n devops-apps --timeout=60s
+      #     sleep 5
+      #     done
   
 
       - name: Apply Monitoring Manifests
