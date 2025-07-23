@@ -1,37 +1,43 @@
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: microservices-ingress
-#   namespace: devops-apps
-#   annotations:
-#     nginx.ingress.kubernetes.io/rewrite-target: /$1
-# spec:
-#   rules:
-#     - host: myapp.local
-#       http:
-#         paths:
-#           - path: /auth/?(.*)
-#             pathType: Prefix
-#             backend:
-#               service:
-#                 name: auth
-#                 port:
-#                   number: 80
-#           - path: /products/?(.*)
-#             pathType: Prefix
-#             backend:
-#               service:
-#                 name: products
-#                 port:
-#                   number: 80
-#           - path: /orders/?(.*)
-#             pathType: Prefix
-#             backend:
-#               service:
-#                 name: orders
-#                 port:
-#                   number: 80
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: viviennedofit-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # For TLS certificates
+    nginx.ingress.kubernetes.io/rewrite-target: /$2     # For path rewriting
+    nginx.ingress.kubernetes.io/use-regex: "true"       # Enable regex in paths
+spec:
+  rules:
+  - host: viviennedofit.com
+    http:
+      paths:
+      - path: /auth(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: auth
+            port:
+              number: 3000
+      - path: /products(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: products
+            port:
+              number: 3001
+      - path: /orders(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: orders
+            port:
+              number: 3002
+  tls:
+  - hosts:
+    - viviennedofit.com
+    secretName: viviennedofit-tls
 
+    
 # apiVersion: networking.k8s.io/v1
 # kind: Ingress
 # metadata:
@@ -154,37 +160,67 @@
 
 
 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: microservices-ingress
-  namespace: devops-apps
-  annotations:
-    # remove this line completely
-    # nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx
-  rules:
-    - http:
-        paths:
-          - path: /auth
-            pathType: Prefix
-            backend:
-              service:
-                name: auth
-                port:
-                  number: 80
-          - path: /products
-            pathType: Prefix
-            backend:
-              service:
-                name: products
-                port:
-                  number: 80
-          - path: /orders
-            pathType: Prefix
-            backend:
-              service:
-                name: orders
-                port:
-                  number: 80
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: microservices-ingress
+#   namespace: devops-apps
+#   annotations:
+#     # remove this line completely
+#     # nginx.ingress.kubernetes.io/rewrite-target: /
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - http:
+#         paths:
+#           - path: /auth
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: auth
+#                 port:
+#                   number: 80
+#           - path: /products
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: products
+#                 port:
+#                   number: 80
+#           - path: /orders
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: orders
+#                 port:
+#                   number: 80
+
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: devops-ingress
+#   namespace: devops-apps
+#   annotations:
+#     alb.ingress.kubernetes.io/scheme: internet-facing
+# spec:
+#   ingressClassName: alb
+#   rules:
+#     - http:
+#         paths:
+#           - path: /auth
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: auth
+#                 port:
+#                   number: 80
+#           - path: /orders
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: orders
+#                 port:
+#                   number: 80
+
+
