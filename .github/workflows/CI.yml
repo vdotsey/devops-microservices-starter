@@ -1,36 +1,3 @@
-
-# name: CI Build and Push
-
-# on:
-#   push:
-#     branches: [ main ]
-
-# jobs:
-#   build-and-push:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         service: [auth, products, orders]
-
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v4
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
-
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-#       - name: Build and Push ${{ matrix.service }}
-#         run: |
-#           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest ./${{ matrix.service }}
-#           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
-
-
 name: CI Build and Push to ECR
 
 on:
@@ -102,15 +69,6 @@ jobs:
           kubectl apply -f k8s/$svc/service.yaml -n devops-apps
           fi
           done
-
-      # - name: Rollout deployments
-      #   run: |
-      #     for svc in auth products orders; do
-      #     echo "Restarting and waiting for rollout of $svc..."
-      #     kubectl rollout restart deployment $svc -n devops-apps
-      #     kubectl rollout status deployment $svc -n devops-apps --timeout=60s
-      #     sleep 5
-      #     done
   
       - name: Apply Monitoring Manifests
         run: kubectl apply -f monitoring/ 
@@ -132,70 +90,3 @@ jobs:
           kubectl get pods -n devops-apps
           kubectl get services -n devops-apps
 
-# name: CI Build and Deploy to EKS
-
-# on:
-#   push:
-#     branches: [ main ]
-
-# jobs:
-#   build-and-deploy:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         service: [auth, products, orders]
-
-#     steps:
-#       # Build and push to ECR
-#       - name: Checkout repo
-#         uses: actions/checkout@v4
-
-#       - name: Configure AWS Credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: ${{ secrets.AWS_REGION }}
-
-#       - name: Login to Amazon ECR
-#         id: login-ecr
-#         uses: aws-actions/amazon-ecr-login@v2
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
-
-#       - name: Build and Push ${{ matrix.service }}
-#         run: |
-#           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-#           ECR_REPOSITORY=$ECR_REGISTRY/my-app-${{ matrix.service }}
-#           docker build -t $ECR_REPOSITORY:latest ./${{ matrix.service }}
-#           docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
-#           docker push $ECR_REPOSITORY:latest
-#           docker push $ECR_REPOSITORY:$GITHUB_SHA
-
-#       # Deploy to EKS
-#       - name: Configure kubectl access
-#         if: matrix.service == 'auth'  # Only run once
-#         run: aws eks update-kubeconfig --name eks-dev-eks-cluster --region eu-north-1
-
-#       - name: Ensure namespace exists
-#         if: matrix.service == 'auth'  # Only run once
-#         run: kubectl create namespace devops-apps --dry-run=client -o yaml | kubectl apply -f -
-
-#       - name: Deploy ${{ matrix.service }}
-#         run: |
-#           # Apply deployment
-#           kubectl apply -f k8s/${{ matrix.service }}/deployment.yaml -n devops-apps
-          
-#           # Apply service if file exists
-#           if [ -f "k8s/${{ matrix.service }}/service.yaml" ]; then
-#             kubectl apply -f k8s/${{ matrix.service }}/service.yaml -n devops-apps
-#           fi
-
-#       # Verification (run once at the end)
-#       - name: Verify deployments
-#         if: matrix.service == 'auth'  # Only run once
-#         run: |
-#           kubectl get deployments -n devops-apps
-#           kubectl get pods -n devops-apps
-#           kubectl get services -n devops-apps
